@@ -3,8 +3,8 @@
 // ------------------------------------------------------------------ //
 
 export const UserRole = {
-  SuperAdmin: 'super_admin',
-  OrgAdmin: 'org_admin',
+  SuperAdmin: 'superadmin',
+  OrgAdmin: 'orgadmin',
   Technician: 'technician',
   Clinician: 'clinician',
   Coordinator: 'coordinator',
@@ -86,6 +86,10 @@ export interface Organization {
   name: string
   slug: string
   logoUrl?: string
+  contactEmail?: string
+  contactPhone?: string
+  address?: string
+  timezone?: string
   isActive: boolean
   createdAt: string
   updatedAt: string
@@ -96,50 +100,93 @@ export interface Site {
   orgId: string
   name: string
   address?: string
+  timezone?: string
+  contactName?: string
+  contactEmail?: string
+  contactPhone?: string
   isActive: boolean
+  createdAt?: string
+  updatedAt?: string
 }
 
 export interface User {
   id: string
   email: string
-  firstName: string
-  lastName: string
+  fullName: string
   role: UserRole
   orgId: string
   siteId?: string
   phone?: string
   avatarUrl?: string
   isActive: boolean
+  lastLoginAt?: string
   createdAt: string
 }
 
 export interface Device {
   id: string
-  orgId: string
   siteId: string
-  name: string
-  manufacturer?: string
-  model?: string
+  identifier: string
+  cameraModel?: string
   serialNumber?: string
+  captureNotes?: string
   isActive: boolean
+  lastUsedAt?: string
+  createdAt?: string
+  updatedAt?: string
 }
 
 export interface ReferralDestination {
   id: string
-  orgId: string
   name: string
-  address?: string
+  specialty?: string
+  contactName?: string
   contactEmail?: string
   contactPhone?: string
+  fax?: string
+  address?: string
+  routingNotes?: string
+  isActive: boolean
+  createdAt?: string
+  updatedAt?: string
 }
 
 export interface Protocol {
   id: string
-  orgId: string
   name: string
-  description?: string
-  steps: string[]
+  version: number
+  severityLabel?: string
+  recommendedAction?: string
+  followUpIntervalDays?: number | null
+  urgency: string
   isActive: boolean
+  supersededBy?: string | null
+  createdBy?: string | null
+  createdAt?: string
+  updatedAt?: string
+}
+
+export interface ProtocolGroup {
+  name: string
+  versions: Protocol[]
+}
+
+export interface ClinicalTaxonomy {
+  id: string
+  severityLabels: string[]
+  ungradableReasons: string[]
+  dmeFlagsEnabled: boolean
+}
+
+export interface OrgPlanUsage {
+  planName: string
+  maxUsers: number
+  usedUsers: number
+  maxStorageGb: number
+  usedStorageGb: number
+  maxCasesPerMonth: number
+  usedCasesThisMonth: number
+  percentageUsed: number
 }
 
 // ------------------------------------------------------------------ //
@@ -262,13 +309,28 @@ export interface Notification {
 
 export interface AuditLog {
   id: string
-  userId?: string
+  actor?: string
   orgId?: string
-  method: string
-  endpoint: string
-  statusCode: number
+  action: string
+  resourceType: string
+  resourceId?: string
+  detail?: Record<string, unknown>
   ipAddress?: string
+  userAgent?: string
   createdAt: string
+}
+
+export interface Invitation {
+  id: string
+  email: string
+  role: UserRole
+  site?: string
+  token: string
+  isAccepted: boolean
+  expiresAt: string
+  invitedBy: string
+  createdAt: string
+  status: 'pending' | 'accepted' | 'expired'
 }
 
 export interface Plan {

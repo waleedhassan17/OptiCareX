@@ -1,18 +1,16 @@
 class TenantQuerysetMixin:
     """
     Mixin for DRF viewsets that automatically filters querysets by the
-    requesting user's organization. SuperAdmin users see all records.
+    requesting user's organization (set by TenantMiddleware on request.org).
+    SuperAdmin users (request.org is None) see all records.
     """
 
     def get_queryset(self):
         qs = super().get_queryset()
-        user = self.request.user
+        org = getattr(self.request, "org", None)
 
-        if getattr(user, "role", None) == "super_admin":
+        if org is None:
+            # SuperAdmin or unauthenticated — return all
             return qs
 
-        org_id = getattr(user, "org_id", None)
-        if org_id is not None:
-            return qs.filter(org_id=org_id)
-
-        return qs.none()
+        return qs.filter(org=org)

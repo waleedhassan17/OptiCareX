@@ -8,25 +8,36 @@ class IsSuperAdmin(BasePermission):
         return (
             request.user
             and request.user.is_authenticated
-            and getattr(request.user, "role", None) == "super_admin"
+            and getattr(request.user, "role", None) == "superadmin"
         )
 
 
 class IsOrgAdmin(BasePermission):
-    """Allows access to organization administrators."""
+    """Allows access to organization administrators (+ superadmin)."""
 
     def has_permission(self, request, view):
         return (
             request.user
             and request.user.is_authenticated
-            and getattr(request.user, "role", None) in ("super_admin", "org_admin")
+            and getattr(request.user, "role", None) in ("superadmin", "orgadmin")
+        )
+
+
+class IsOrgAdminOnly(BasePermission):
+    """Allows access strictly to orgadmin role."""
+
+    def has_permission(self, request, view):
+        return (
+            request.user
+            and request.user.is_authenticated
+            and getattr(request.user, "role", None) == "orgadmin"
         )
 
 
 class IsTechnician(BasePermission):
     """Allows access to technicians (and above)."""
 
-    ALLOWED_ROLES = {"super_admin", "org_admin", "technician"}
+    ALLOWED_ROLES = {"superadmin", "orgadmin", "technician"}
 
     def has_permission(self, request, view):
         return (
@@ -39,7 +50,7 @@ class IsTechnician(BasePermission):
 class IsClinician(BasePermission):
     """Allows access to clinicians (and above)."""
 
-    ALLOWED_ROLES = {"super_admin", "org_admin", "clinician"}
+    ALLOWED_ROLES = {"superadmin", "orgadmin", "clinician"}
 
     def has_permission(self, request, view):
         return (
@@ -52,7 +63,7 @@ class IsClinician(BasePermission):
 class IsCoordinator(BasePermission):
     """Allows access to care coordinators (and above)."""
 
-    ALLOWED_ROLES = {"super_admin", "org_admin", "coordinator"}
+    ALLOWED_ROLES = {"superadmin", "orgadmin", "coordinator"}
 
     def has_permission(self, request, view):
         return (

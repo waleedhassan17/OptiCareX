@@ -1,19 +1,24 @@
 import api from './axiosInstance'
-import type { UsageMetrics } from '../types'
 
 export const analyticsApi = {
-  getUsage: async (params?: Record<string, unknown>) => {
-    const { data } = await api.get<UsageMetrics>('/analytics/usage/', { params })
+  getAdminSummary: async () => {
+    const { data } = await api.get('/analytics/admin-summary/')
     return data
   },
-
-  getDashboard: async (params?: Record<string, unknown>) => {
-    const { data } = await api.get('/analytics/dashboard/', { params })
+  getTechnicianSummary: async () => {
+    const { data } = await api.get('/analytics/technician-summary/')
     return data
   },
-
-  getReports: async (params?: Record<string, unknown>) => {
-    const { data } = await api.get('/analytics/reports/', { params })
+  getClinicianSummary: async () => {
+    const { data } = await api.get('/analytics/clinician-summary/')
+    return data
+  },
+  getCoordinatorSummary: async () => {
+    const { data } = await api.get('/analytics/coordinator-summary/')
+    return data
+  },
+  getPlatformSummary: async () => {
+    const { data } = await api.get('/analytics/platform-summary/')
     return data
   },
 }

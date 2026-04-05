@@ -51,3 +51,17 @@ AWS_DEFAULT_ACL = None
 
 # Uncomment to use MinIO locally:
 # STORAGES["default"]["BACKEND"] = "storages.backends.s3boto3.S3Boto3Storage"
+
+# ---------------------------------------------------------------------------
+# Cache — fall back to LocMemCache when Redis is not available
+# ---------------------------------------------------------------------------
+_redis_url = os.environ.get("REDIS_URL")
+if not _redis_url:
+    CACHES = {
+        "default": {
+            "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
+        }
+    }
+    # Run Celery tasks synchronously when no broker is available
+    CELERY_TASK_ALWAYS_EAGER = True
+    CELERY_TASK_EAGER_PROPAGATES = True

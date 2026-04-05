@@ -26,6 +26,7 @@ DJANGO_APPS = [
 THIRD_PARTY_APPS = [
     "rest_framework",
     "rest_framework_simplejwt",
+    "rest_framework_simplejwt.token_blacklist",
     "corsheaders",
     "django_filters",
     "drf_spectacular",
@@ -61,6 +62,8 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "apps.core.middleware.TenantMiddleware",
+    "apps.billing.middleware.PlanLimitMiddleware",
     "apps.audit.middleware.AuditMiddleware",
 ]
 
@@ -152,7 +155,13 @@ SIMPLE_JWT = {
     "ROTATE_REFRESH_TOKENS": True,
     "BLACKLIST_AFTER_ROTATION": True,
     "AUTH_HEADER_TYPES": ("Bearer",),
+    "TOKEN_OBTAIN_SERIALIZER": "rest_framework_simplejwt.serializers.TokenObtainPairSerializer",
 }
+
+# ---------------------------------------------------------------------------
+# Email
+# ---------------------------------------------------------------------------
+DEFAULT_FROM_EMAIL = os.environ.get("DEFAULT_FROM_EMAIL", "noreply@opticarex.com")
 
 # ---------------------------------------------------------------------------
 # CORS
@@ -161,11 +170,26 @@ CORS_ALLOWED_ORIGINS = os.environ.get(
     "CORS_ALLOWED_ORIGINS",
     "http://localhost:3000,http://127.0.0.1:3000",
 ).split(",")
+CORS_ALLOW_CREDENTIALS = True
+
+FRONTEND_URL = os.environ.get("FRONTEND_URL", "http://localhost:3000")
+
+# ---------------------------------------------------------------------------
+# Redis / Cache
+# ---------------------------------------------------------------------------
+REDIS_URL = os.environ.get("REDIS_URL", "redis://localhost:6379/0")
+
+CACHES = {
+    "default": {
+        "BACKEND": "django.core.cache.backends.redis.RedisCache",
+        "LOCATION": REDIS_URL,
+    }
+}
 
 # ---------------------------------------------------------------------------
 # Celery
 # ---------------------------------------------------------------------------
-CELERY_BROKER_URL = os.environ.get("REDIS_URL", "redis://localhost:6379/0")
+CELERY_BROKER_URL = REDIS_URL
 CELERY_RESULT_BACKEND = CELERY_BROKER_URL
 CELERY_ACCEPT_CONTENT = ["json"]
 CELERY_TASK_SERIALIZER = "json"

@@ -49,12 +49,17 @@ class AuditMiddleware:
 
             if hasattr(AuditLog, "objects"):
                 AuditLog.objects.create(
-                    user=user,
+                    actor=user,
                     org_id=getattr(user, "org_id", None),
-                    method=request.method,
-                    endpoint=request.get_full_path(),
-                    status_code=response.status_code,
+                    action=request.method,
+                    resource_type="http_request",
+                    resource_id="",
+                    detail={
+                        "endpoint": request.get_full_path(),
+                        "status_code": response.status_code,
+                    },
                     ip_address=self._get_client_ip(request),
+                    user_agent=request.META.get("HTTP_USER_AGENT", ""),
                 )
         except Exception:
             # Model might not be migrated yet during initial setup
